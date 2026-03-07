@@ -35,7 +35,6 @@ Prediction of High-Risk Customers
 - Random Forest Classifier
 
 ---
-
 ## Dataset
 
 The dataset contains telecom customer information including:
