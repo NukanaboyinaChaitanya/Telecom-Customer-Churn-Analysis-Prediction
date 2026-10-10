@@ -151,8 +151,3 @@ README.md
 5. The model outputs predicted churn customers in prediction.csv.
 
 ---
-
-## Author
-
-Chaitanya 
-Aspiring Data Analyst | AIML Student
