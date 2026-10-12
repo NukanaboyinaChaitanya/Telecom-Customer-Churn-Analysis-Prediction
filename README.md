@@ -151,4 +151,4 @@ README.md
 5. The model outputs predicted churn customers in prediction.csv.
 
 ---
-telecom customer chutn prediction
+
