@@ -1,278 +1,405 @@
 # 📉 Telecom Customer Churn Analysis & Prediction
 
-An end-to-end churn analytics project on an Indian telecom customer dataset, combining **SQL Server** (data profiling & cleaning), **Power BI** (interactive dashboard) and **Python** (EDA + machine learning) to understand *why* customers leave and *who* is likely to leave next.
-
----
+An end-to-end telecom customer churn analytics project using **SQL Server, Power BI, and Python**. This project analyzes customer behavior, identifies churn patterns, builds machine learning models, and provides business recommendations to improve customer retention.
 
 ## 📌 Table of Contents
+
 - [Project Overview](#-project-overview)
 - [Business Problem](#-business-problem)
 - [Tech Stack](#-tech-stack)
 - [Repository Structure](#-repository-structure)
 - [Dataset](#-dataset)
-- [Workflow](#-workflow)
+- [Project Workflow](#-project-workflow)
 - [Power BI Dashboard](#-power-bi-dashboard)
-- [Key Insights](#-key-insights)
+- [Key Business Insights](#-key-business-insights)
 - [Machine Learning Model](#-machine-learning-model)
+- [Feature Importance](#-feature-importance)
 - [Business Recommendations](#-business-recommendations)
 - [How to Run](#-how-to-run)
-- [Limitations & Future Work](#-limitations--future-work)
+- [Limitations & Future Improvements](#-limitations--future-improvements)
 
 ---
 
 ## 🔍 Project Overview
 
-| Metric | Value |
-|---|---|
-| Total customers | **6,418** |
-| New joiners | **411** |
-| Churned customers | **1,732** |
-| Churn rate (dashboard) | **27.0%** |
-| Features | 32 raw columns |
-| Best model | Logistic Regression (ROC-AUC **0.872**) |
+This project combines SQL-based data analysis, Power BI visualization, and Python-based machine learning to understand telecom customer churn.
 
-The project answers three questions:
-1. **Who** is churning? (demographics, contract, services)
-2. **Why** are they churning? (churn category / reason)
-3. **Who will churn next?** (predictive model with a tuned decision threshold)
+| Metric | Value |
+|---|---:|
+| Total customers | 6,418 |
+| Existing customers | 6,007 |
+| New joiners | 411 |
+| Churned customers | 1,732 |
+| Churn rate among existing customers | 28.83% |
+| Total dataset columns | 32 |
+| Best-performing model by ROC-AUC | Logistic Regression |
+| ROC-AUC | 0.872 |
+
+### Project Objectives
+
+1. Identify customer segments with high churn rates.
+2. Understand the major reasons behind customer churn.
+3. Analyze customer behavior and service usage.
+4. Build a machine learning model to predict potential churners.
+5. Provide actionable business recommendations for customer retention.
 
 ---
 
 ## 🎯 Business Problem
 
-Customer acquisition costs far more than retention. The goal is to identify the main drivers of churn so the business can run targeted retention campaigns and focus offers on high-risk segments instead of discounting across the board.
+Customer retention is important for telecom companies because acquiring new customers can be more expensive than retaining existing ones.
+
+The objective of this project is to identify customers who are likely to leave the service, understand the factors associated with churn, and help businesses develop targeted retention strategies.
 
 ---
 
 ## 🛠 Tech Stack
 
-| Layer | Tools |
+| Category | Technologies |
 |---|---|
-| Database / ETL | SQL Server (T-SQL) |
-| Visualization | Power BI |
-| Analysis & ML | Python, Pandas, NumPy, Matplotlib, Seaborn, scikit-learn |
+| Programming | Python |
+| Database | SQL Server |
+| Data Analysis | Pandas, NumPy |
+| Data Visualization | Matplotlib, Seaborn, Power BI |
+| Machine Learning | Scikit-learn |
+| Algorithms | Logistic Regression, Random Forest |
 | Environment | Jupyter Notebook |
 
 ---
 
 ## 📁 Repository Structure
 
-```
+```text
 Telecom-Customer-Churn-Analysis-Prediction/
 │
 ├── Data/
-│   └── Customer_Data.csv              # Raw dataset (6,418 rows × 32 columns)
+│   └── Customer_Data.csv
 │
 ├── SQL/
-│   └── churn_queries.sql              # Profiling, null checks, prod table & Power BI views
+│   └── churn_queries.sql
 │
 ├── Notebook/
-│   └── customerchurnprediction.ipynb  # Cleaning, EDA, modelling, evaluation
+│   └── customerchurnprediction.ipynb
 │
 ├── PowerBI/
-│   └── Churn_Dashboard.pbix           # Power BI report
+│   └── Churn_Dashboard.pbix
 │
 ├── Images/
-│   └── dashboard.png                  # Dashboard screenshot
+│   └── dashboard.png
 │
 └── README.md
 ```
 
-> Adjust folder and file names to match your actual repo layout.
+*Update folder and file names to match your actual GitHub repository.*
 
 ---
 
 ## 📊 Dataset
 
-Each row is one customer. Columns fall into these groups:
+The dataset contains 6,418 customer records and 32 columns.
 
-| Group | Columns |
+### Main Feature Categories
+
+| Category | Features |
 |---|---|
-| **Demographics** | Customer_ID, Gender, Age, Married, State |
-| **Engagement** | Number_of_Referrals, Tenure_in_Months, Value_Deal |
-| **Phone services** | Phone_Service, Multiple_Lines |
-| **Internet services** | Internet_Service, Internet_Type, Online_Security, Online_Backup, Device_Protection_Plan, Premium_Support, Streaming_TV, Streaming_Movies, Streaming_Music, Unlimited_Data |
-| **Billing** | Contract, Paperless_Billing, Payment_Method, Monthly_Charge, Total_Charges, Total_Refunds, Total_Extra_Data_Charges, Total_Long_Distance_Charges, Total_Revenue |
-| **Target / outcome** | Customer_Status (`Stayed`, `Churned`, `Joined`), Churn_Category, Churn_Reason |
+| Demographics | Customer_ID, Gender, Age, Married, State |
+| Customer Engagement | Number_of_Referrals, Tenure_in_Months, Value_Deal |
+| Phone Services | Phone_Service, Multiple_Lines |
+| Internet Services | Internet_Service, Internet_Type, Online_Security, Online_Backup, Device_Protection_Plan, Premium_Support, Streaming_TV, Streaming_Movies, Streaming_Music, Unlimited_Data |
+| Billing | Contract, Paperless_Billing, Payment_Method, Monthly_Charge, Total_Charges, Total_Revenue |
+| Customer Outcome | Customer_Status, Churn_Category, Churn_Reason |
 
-**Customer status split:** Stayed 4,275 · Churned 1,732 · Joined 411
+### Customer Status Distribution
+
+| Customer Status | Count |
+|---|---:|
+| Stayed | 4,275 |
+| Churned | 1,732 |
+| Joined | 411 |
+| **Total** | **6,418** |
+
+For machine learning, only existing customers with a known outcome (`Stayed` or `Churned`) were considered. New joiners were excluded because their future churn status is not yet known.
 
 ---
 
-## ⚙️ Workflow
+## ⚙️ Project Workflow
 
-### 1. SQL – Profiling & Cleaning
-- Profiled distributions of Gender, Contract, State and Customer_Status (with revenue share).
-- Ran a null-count audit across all 32 columns.
-- Replaced nulls with meaningful values and loaded the result into a production table `prod_churn`:
-  - Service add-on fields → `'No'` / `'None'`
-  - `Value_Deal` → `'None'`
-  - `Churn_Category`, `Churn_Reason` → `'Others'`
-- Created Power BI-ready views:
-  - `vw_ChurnData` – customers with status `Churned` or `Stayed`
-  - `vw_JoinData` – customers with status `Joined`
+### 1. SQL Server – Data Profiling and Analysis
+
+- Analyzed customer distributions across gender, contract, state, and customer status.
+- Performed missing-value checks across all 32 columns.
+- Cleaned missing values in customer service-related fields.
+- Created a production table named `prod_churn`.
+- Created analytical views:
+  - `vw_ChurnData` – customers who stayed or churned.
+  - `vw_JoinData` – newly joined customers.
 
 ### 2. Python – Data Cleaning
-| Issue | Finding | Fix |
+
+Performed data cleaning using Pandas.
+
+| Data Issue | Finding | Action Taken |
 |---|---|---|
-| Internet add-ons null (1,390 rows) | Exactly the customers with `Internet_Service = No` | Filled with `No Internet Service` |
-| `Multiple_Lines` null (622 rows) | Exactly the customers with `Phone_Service = No` | Filled with `No Phone Service` |
-| `Value_Deal` null (3,548 rows) | Customer is not on any deal | Filled with `No Deal` |
-| Negative `Monthly_Charge` | Values between −10 and −1 (invalid) | Replaced with median of valid charges |
-| Duplicates | 0 | None needed |
+| Internet service-related missing values | 1,390 rows | Filled with `No Internet Service` |
+| Multiple_Lines missing values | 622 rows | Filled with `No Phone Service` |
+| Value_Deal missing values | 3,548 rows | Filled with `No Deal` |
+| Negative Monthly_Charge | 107 invalid values | Replaced with median of valid charges |
+| Duplicate records | 0 | No action required |
 
-`Churn_Category` / `Churn_Reason` nulls (4,686) are expected, since they only exist for churned customers.
+Missing values in `Churn_Category` and `Churn_Reason` were retained because these fields are applicable only to churned customers.
 
-### 3. Python – Exploratory Data Analysis
-Churn rate computed across Contract, Tenure, Payment Method, Internet Type, Gender, Age Group, Marital Status and every add-on service, plus a correlation heatmap of numeric features.
+### 3. Exploratory Data Analysis (EDA)
 
-### 4. Python – Modelling
-- Restricted to `Stayed` vs `Churned` customers (6,007 rows). `Joined` customers have no outcome yet.
-- 80/20 stratified train/test split (`random_state=42`).
-- **Data leakage prevention:** dropped `Customer_ID`, `Churn_Category`, `Churn_Reason` and the cumulative billing columns (`Total_Charges`, `Total_Refunds`, `Total_Extra_Data_Charges`, `Total_Long_Distance_Charges`, `Total_Revenue`).
-- One-hot encoding for 19 categorical features, standard scaling for 4 numeric features (fit on train only).
-- Compared three models, then tuned the decision threshold.
+Analyzed churn rates across:
+
+- Contract types
+- Tenure groups
+- Payment methods
+- Internet types
+- Gender and age groups
+- Marital status
+- Additional services
+
+Created visualizations including customer distribution charts, churn-rate comparisons, and a numerical correlation heatmap.
+
+### 4. Machine Learning Preparation
+
+- Selected 6,007 existing customers.
+- Removed `Customer_ID` and post-outcome fields `Churn_Category` and `Churn_Reason`.
+- Excluded cumulative billing columns from model predictors.
+- Split data into training and testing sets using stratified sampling (80:20).
+- Applied One-Hot Encoding to categorical features.
+- Applied StandardScaler to numerical features.
+- Fitted preprocessing transformations on training data only.
+
+### 5. Model Building
+
+Trained and compared three classification models:
+
+- Logistic Regression
+- Balanced Logistic Regression
+- Random Forest
+
+Evaluated the models using accuracy, precision, recall, F1-score, confusion matrices, and ROC-AUC.
 
 ---
 
 ## 📈 Power BI Dashboard
 
-![Churn Dashboard](Images/dashboard.png)
+![Telecom Customer Churn Dashboard](Images/dashboard.png)
 
-**KPI cards:** Total Customers · New Joiners · Total Churn · Churn Rate
-**Slicers:** Monthly Charge Range, Married
+### KPI Cards
 
-**Visuals:**
+- Total Customers
+- New Joiners
+- Total Churn
+- Churn Rate
+
+### Dashboard Visualizations
+
 - Total Churn by Gender
-- Total Customers & Churn Rate by Age Group
+- Total Customers and Churn Rate by Age Group
 - Total Churn by Churn Category
-- Churn Rate by State (Top 5)
+- Churn Rate by State
 - Churn Rate by Contract
 - Churn Rate by Payment Method
-- Total Customers & Churn Rate by Tenure Group
+- Total Customers and Churn Rate by Tenure Group
 - Churn Rate by Internet Type
-- Churn by Services (Yes vs No)
+- Churn by Additional Services
+
+### Interactive Filters
+
+- Monthly Charge Range
+- Married Status
 
 ---
 
-## 💡 Key Insights
+## 💡 Key Business Insights
 
-**Contract type is the strongest signal**
-- Month-to-month customers churn at roughly **46–52%**, versus about **11%** for one-year and under **3%** for two-year contracts.
+### 1. Contract Type
 
-**Competitors are the #1 reason for churn**
-- **761** of the 1,732 churned customers (about 44%) left because of a competitor, followed by Attitude (301), Dissatisfaction (300) and Price (196).
+Contract type is one of the strongest churn indicators.
 
-**Payment method matters**
-- Mailed check (~38–43%) and bank withdrawal (~34–36%) show far higher churn than credit card (~15–16%).
+- Month-to-Month: 52.38% churn rate.
+- One-Year: 11.23% churn rate.
+- Two-Year: 2.77% churn rate.
 
-**Fiber Optic customers churn the most**
-- Fiber Optic churn is around **41–42%**, versus DSL at ~19–21%. Customers with no internet service churn the least (~8–9%).
+### 2. Payment Method
 
-**Support & security services protect against churn**
-- Customers *without* Online Security (45%) or Premium Support (45%) churn about **3× more** than those with them (15–16%).
+- Mailed Check: 42.86% churn rate.
+- Bank Withdrawal: 36.05% churn rate.
+- Credit Card: 16.16% churn rate.
 
-**Seniors churn more**
-- Customers over 50 have the highest churn (31% in the dashboard; 33% for the 50+ group in the notebook).
+### 3. Internet Type
 
-**Geography**
-- Jammu & Kashmir shows an extreme churn rate of **57.2%**, followed by Assam (38.1%), Jharkhand (34.5%), Chhattisgarh (30.5%) and Delhi (29.9%).
+- Fiber Optic: 42.47% churn rate.
+- Cable: 27.57% churn rate.
+- DSL: 20.82% churn rate.
+- No Internet Service: 8.91% churn rate.
 
-**Weak or no signal**
-- Gender, marital status and number of referrals show little difference in churn rate. Tenure group shows a fairly flat ~26–28% pattern.
+### 4. Additional Services
+
+Customers without certain additional services showed higher churn rates.
+
+- Without Online Security: 45.19%.
+- With Online Security: 14.94%.
+- Without Premium Support: 45.00%.
+- With Premium Support: 15.77%.
+
+### 5. Age Group
+
+Senior customers showed a higher churn rate than younger and middle-aged customers.
+
+### 6. Geography
+
+Jammu & Kashmir showed the highest churn rate at approximately 57.2%, followed by Assam and Jharkhand.
+
+### 7. Competitor-Related Churn
+
+Competitors were the leading reported churn category:
+
+- Competitor: 761 customers.
+- Attitude: 301 customers.
+- Dissatisfaction: 300 customers.
+- Price: 196 customers.
 
 ---
 
 ## 🤖 Machine Learning Model
 
-### Model comparison (test set, threshold 0.50)
+### Model Comparison
+
+The following results were obtained on the test dataset using the default classification threshold of 0.50.
 
 | Model | Accuracy | Churn Precision | Churn Recall | Churn F1 | ROC-AUC |
-|---|---|---|---|---|---|
-| **Logistic Regression** | 0.82 | 0.70 | 0.67 | 0.68 | **0.872** |
-| Random Forest (200 trees, balanced) | 0.82 | 0.73 | 0.60 | 0.66 | 0.868 |
-| Logistic Regression (balanced) | 0.78 | 0.58 | 0.82 | 0.68 | 0.871 |
+|---|---:|---:|---:|---:|---:|
+| Logistic Regression | 82% | 70% | 67% | 68% | **0.872** |
+| Random Forest | 82% | 73% | 60% | 66% | 0.868 |
+| Balanced Logistic Regression | 78% | 58% | 82% | 68% | 0.871 |
 
-Logistic Regression was selected: it has the best ROC-AUC, it is simple, and its coefficients are directly interpretable.
+### Model Selection
 
-### Threshold tuning
+Logistic Regression was selected based on its highest ROC-AUC score of approximately 0.872 and its interpretability.
 
-Since missing a churner costs more than contacting a loyal customer, the threshold was lowered to improve recall:
+### Classification Threshold Tuning
 
-| Threshold | Precision | Recall | F1 |
-|---|---|---|---|
-| 0.50 | 0.70 | 0.67 | 0.68 |
-| **0.40 (chosen)** | 0.65 | **0.76** | **0.70** |
-| 0.35 | 0.62 | 0.78 | 0.69 |
+The default threshold of 0.50 was compared with lower thresholds to improve churn detection.
 
-**Final model at threshold 0.40:** Accuracy **81%**, Churn Recall **76%**, Churn Precision **65%**, F1 **0.70**.
+| Threshold | Churn Precision | Churn Recall | Churn F1-score |
+|---|---:|---:|---:|
+| 0.50 | 70% | 67% | 68% |
+| **0.40** | **65%** | **76%** | **70%** |
+| 0.35 | 62% | 78% | 69% |
 
-### Top churn drivers (Logistic Regression coefficients)
+### Results at Threshold 0.40
 
-| Increases churn risk ⬆️ | Decreases churn risk ⬇️ |
-|---|---|
-| Contract: Month-to-Month | Contract: Two Year |
-| Higher Monthly Charge | Online Security: Yes |
-| Value Deal 5 | Premium Support: Yes |
-| State: Jammu & Kashmir, Assam, Jharkhand | Value Deals 2 and 3 |
-| Payment: Mailed Check | Payment: Credit Card |
+| Metric | Result |
+|---|---:|
+| Accuracy | 81% |
+| Churn Precision | 65% |
+| Churn Recall | 76% |
+| Churn F1-score | 70% |
+
+The 0.40 threshold was selected as an exploratory candidate because it achieved the highest churn F1-score among the three tested thresholds.
+
+**Note:** Threshold selection and evaluation were performed using the same test set. Therefore, these results should be treated as exploratory rather than an unbiased final performance estimate. A separate validation process is needed before deployment.
+
+---
+
+## 📌 Feature Importance Analysis
+
+Logistic Regression coefficients were analyzed to understand which features were associated with higher or lower predicted churn.
+
+### Features Associated with Higher Churn
+
+- Month-to-Month Contract
+- Higher Monthly Charges
+- Value Deal 5
+- Certain geographic regions, including Jammu & Kashmir, Assam, and Jharkhand
+- Mailed Check Payment Method
+
+### Features Associated with Lower Churn
+
+- Two-Year Contract
+- Online Security
+- Premium Support
+- Credit Card Payment Method
+- Value Deals 2 and 3
+
+These coefficients represent model associations relative to the relevant reference categories. They do not establish causation.
 
 ---
 
 ## 🚀 Business Recommendations
 
-1. **Push contract upgrades.** Offer discounts or perks for moving month-to-month customers to 1 or 2-year plans.
-2. **Bundle security and support.** Online Security and Premium Support are strongly linked with retention, so include them in plans or offer free trials.
-3. **Counter competitors.** Competitor-driven churn is the largest category, so use competitive pricing, device offers and win-back campaigns.
-4. **Encourage auto-pay by credit card.** Offer incentives to move customers off mailed check and bank withdrawal.
-5. **Fix Fiber Optic experience.** Investigate service quality and pricing for this high-churn segment.
-6. **Regional action plans.** Prioritize Jammu & Kashmir, Assam and Jharkhand for network and service reviews.
-7. **Use the model for targeting.** Score active customers and contact those above the 0.40 churn probability threshold with retention offers.
-8. **Review Deal 5.** It is associated with higher churn, so check its pricing and terms.
+1. **Encourage Long-Term Contracts:** Offer incentives to month-to-month customers to upgrade to one-year or two-year plans.
+2. **Improve Customer Support:** Promote Online Security and Premium Support services.
+3. **Review Pricing Strategies:** Investigate customers with higher monthly charges.
+4. **Address Competitor-Related Churn:** Develop competitive pricing and customer retention campaigns.
+5. **Improve Fiber Optic Services:** Investigate service quality and pricing for Fiber Optic customers.
+6. **Regional Retention Strategies:** Investigate customer experiences in high-churn states.
+7. **Target At-Risk Customers:** Use churn predictions to prioritize customer retention campaigns.
 
 ---
 
 ## ▶️ How to Run
 
-### 1. Clone the repository
+### 1. Clone the Repository
+
 ```bash
 git clone https://github.com/<your-username>/Telecom-Customer-Churn-Analysis-Prediction.git
+
 cd Telecom-Customer-Churn-Analysis-Prediction
 ```
 
-### 2. Python notebook
+### 2. Install Required Python Libraries
+
 ```bash
-pip install numpy pandas matplotlib seaborn scikit-learn jupyter
+pip install pandas numpy matplotlib seaborn scikit-learn jupyter
+```
+
+### 3. Run the Python Notebook
+
+```bash
 jupyter notebook Notebook/customerchurnprediction.ipynb
 ```
-> ⚠️ Update the CSV path in the notebook's data-loading cell. It currently points to a local Windows path. Use a relative path such as `../Data/Customer_Data.csv`.
 
-### 3. SQL Server
-1. Import `Customer_Data.csv` into a table named `Customer_data`.
-2. Run `SQL/churn_queries.sql` to profile the data, create `prod_churn` and build the views `vw_ChurnData` and `vw_JoinData`.
+Update the dataset path in the notebook to match the repository structure.
 
-### 4. Power BI
-1. Open the `.pbix` file in Power BI Desktop.
-2. Point the data source to your SQL Server instance and refresh.
+### 4. Run SQL Queries
 
----
+- Import the CSV dataset into SQL Server.
+- Execute the SQL scripts in the `SQL` folder.
+- Create the required analytical tables and views.
 
-## ⚠️ Limitations & Future Work
+### 5. Open the Power BI Dashboard
 
-- **Churn rate definition differs between tools.** The Power BI KPI (27.0%) divides churned customers by *all* customers (6,418, including new joiners). The notebook (28.83%) divides by *existing* customers only (Stayed + Churned = 6,007). Both are valid, but state which one you report.
-- **Cleaning differs slightly between SQL and Python.** SQL fills nulls with `No` / `None`, while Python uses `No Internet Service` / `No Phone Service`. The SQL step also does not fix negative `Monthly_Charge` values, which the notebook handles.
-- **Tenure and age bins differ** between the dashboard (5 tenure bins, 4 age bins) and the notebook (3 tenure bins, 3 age bins), so percentages are not directly comparable.
-- Class imbalance (about 29% churn) is handled via threshold tuning rather than resampling.
-- **Future work:**
-  - Try gradient boosting (XGBoost / LightGBM) and cross-validation
-  - Hyperparameter tuning and SHAP explanations
-  - Add a customer lifetime value (CLV) layer to prioritize high-value at-risk customers
-  - Save the trained model and scale it into a scoring pipeline or Streamlit app
+- Open `Churn_Dashboard.pbix` using Power BI Desktop.
+- Configure the SQL Server data source.
+- Refresh the dashboard.
 
 ---
 
+## ⚠️ Limitations & Future Improvements
+
+### Current Limitations
+
+- The Power BI churn rate is 27.0%, while the Python churn rate is 28.83%. The difference is due to different denominators: the dashboard includes all 6,418 customers, while Python considers only 6,007 existing customers.
+- SQL and Python cleaning use slightly different replacement labels.
+- Age and tenure group definitions differ between the dashboard and Python analysis.
+- Threshold selection was performed on the test set, so independent validation is required.
+
+### Future Improvements
+
+- Use a separate validation set or cross-validation for threshold selection.
+- Build a complete preprocessing and modeling pipeline using `ColumnTransformer` and `Pipeline`.
+- Experiment with XGBoost and LightGBM.
+- Perform hyperparameter tuning.
+- Use SHAP for model explainability.
+- Develop a Streamlit application for interactive churn prediction.
+- Deploy the model as an API for customer risk scoring.
 
 
 ---
 
-⭐ If you found this project useful, consider giving it a star!
+⭐ If you find this project useful, consider giving the repository a star!
